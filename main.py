@@ -1,8 +1,8 @@
 import os
 import re
 import zipfile
-
 import sys
+
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog
 from PySide6.QtCore import QFile, QIODevice, QThread, QCoreApplication, Signal
