@@ -1,6 +1,7 @@
 import os
 import re
 import zipfile
+import time
 import sys
 
 from PySide6.QtUiTools import QUiLoader
@@ -14,6 +15,7 @@ class SubThread(QThread):
         super().__init__()
         self.ui_obj = ui_obj
         self.flag_start = False
+        self.py_self_path = os.getcwd()
     
     def run(self):
         # 중복 실행 방지
@@ -76,6 +78,18 @@ class SubThread(QThread):
             self.deleteEmptyFolder()
 
         self.printText("finish\n")
+
+        # 기능 수행 중 처리 불가능한 파일, 폴더들이 생길 수 있음
+        # 해당 오류 목록을 저장하기 위함
+        # failed 없을 때
+        today_now = f"{time.gmtime().tm_year}-{time.gmtime().tm_mon}-{time.gmtime().tm_mday} {time.gmtime().tm_hour}-{time.gmtime().tm_min}-{time.gmtime().tm_sec}"
+        os.chdir(self.py_self_path)# 프로그램 경로에 실패 로그 파일 생성
+        with open(f"fail log {today_now}.txt", "w") as f:
+            f.write("====압축파일 압축해제 실패 목록====\n")
+            log = str(failed)
+            log = log.replace(",", "\n")[1:-2]
+            f.write(log)
+
         self.flag_start = False
 
     # 현재 경로에 있는 폴더, 파일을 리스트 형태로 변환
@@ -136,7 +150,7 @@ class SubThread(QThread):
                 break
 
             if os.path.isfile(content):
-                name, extension = os.path.splitext(content)#문자열에서 이름과 확장자 분리
+                name, extension = os.path.splitext(content)# 문자열에서 이름과 확장자 분리
                 new_name = f"{name} ({count}){extension}"
             elif os.path.isdir(content):
                 new_name = f"{content} ({count})"
@@ -153,7 +167,7 @@ class SubThread(QThread):
         fail_list = []
 
         for content in current_contents:
-            if zipfile.is_zipfile(content):#진짜 zip 파일인지 확인필요
+            if zipfile.is_zipfile(content):# 진짜 zip 파일인지 확인필요
                 try:
                     zip_file = zipfile.ZipFile(content, 'r', metadata_encoding='euc-kr')
                 except Exception as e:
@@ -164,7 +178,7 @@ class SubThread(QThread):
                 file_name, extension = os.path.splitext(content)
                 new_name = self.makeUniqueName(file_name.strip(), path)# ' .zip' 와 같은 이름이 있을 수 있음. 근데 경로 마지막에 공백은 불가능. 따라서 공백 처리
                 try:
-                    zip_file.extractall(new_name)#새로운 경로에 압축해제. 일반적으로 생각하는 압축해제
+                    zip_file.extractall(new_name)# 새로운 경로에 압축해제. 일반적으로 생각하는 압축해제
                     self.printText(f"unzip file : {content} => {new_name}")
                 except Exception as e:
                     self.printText(f"extract error {e}. file {content}")
@@ -328,12 +342,10 @@ app = QApplication(sys.argv)
 window = MainWindow()
 sys.exit(app.exec())
 
+문자열로 큰 숫자 연산이 가능함
+0000 0000
+---- 1111  +
 
-'''
-# todo
-delete pattern
-# 영어, 한국어 외 언어 대응도 필요함
-# f"[{pattern}]" 에서 [] 표현 말고 다른것도 되도록
-
-# 특정 파일 삭제 기능 추가
-'''
+큰 숫자를 부분부분 자르고
+작은 자리부터 일정 자릿수 까지 연산하고 문자열로 만들고
+그 다음 부분의 작은 자리와 이전 연산에서 넘어온 값을 더해서 문자열로 만듦
