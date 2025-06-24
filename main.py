@@ -341,11 +341,3 @@ class MainWindow(QMainWindow):
 app = QApplication(sys.argv)
 window = MainWindow()
 sys.exit(app.exec())
-
-문자열로 큰 숫자 연산이 가능함
-0000 0000
----- 1111  +
-
-큰 숫자를 부분부분 자르고
-작은 자리부터 일정 자릿수 까지 연산하고 문자열로 만들고
-그 다음 부분의 작은 자리와 이전 연산에서 넘어온 값을 더해서 문자열로 만듦
