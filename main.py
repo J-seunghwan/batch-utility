@@ -18,6 +18,8 @@ class SubThread(QThread):
         self.py_self_path = os.getcwd()
     
     def run(self):
+        failed = None
+        
         # 중복 실행 방지
         if self.flag_start == True:
             return
@@ -79,16 +81,17 @@ class SubThread(QThread):
 
         self.printText("finish\n")
 
-        # 기능 수행 중 처리 불가능한 파일, 폴더들이 생길 수 있음
-        # 해당 오류 목록을 저장하기 위함
-        # failed 없을 때
-        today_now = f"{time.gmtime().tm_year}-{time.gmtime().tm_mon}-{time.gmtime().tm_mday} {time.gmtime().tm_hour}-{time.gmtime().tm_min}-{time.gmtime().tm_sec}"
-        os.chdir(self.py_self_path)# 프로그램 경로에 실패 로그 파일 생성
-        with open(f"fail log {today_now}.txt", "w") as f:
-            f.write("====압축파일 압축해제 실패 목록====\n")
-            log = str(failed)
-            log = log.replace(",", "\n")[1:-2]
-            f.write(log)
+        if not failed == None:
+            # 기능 수행 중 처리 불가능한 파일, 폴더들이 생길 수 있음
+            # 해당 오류 목록을 저장하기 위함
+            # failed 없을 때
+            today_now = f"{time.gmtime().tm_year}-{time.gmtime().tm_mon}-{time.gmtime().tm_mday} {time.gmtime().tm_hour}-{time.gmtime().tm_min}-{time.gmtime().tm_sec}"
+            os.chdir(self.py_self_path)# 프로그램 경로에 실패 로그 파일 생성
+            with open(f"fail log {today_now}.txt", "w") as f:
+                f.write("====압축파일 압축해제 실패 목록====\n")
+                log = str(failed)
+                log = log.replace(",", "\n")[1:-2]
+                f.write(log)
 
         self.flag_start = False
 
